@@ -19,7 +19,7 @@ const ChatContainer = () => {
 
     //handle sending a message
     const handleSendMessage = async (e)=>{
-        e.preventDefualt();
+        e.preventDefault();
         if(input.trim() === "") return null;
         await sendMessage({text: input.trim()});
         setInput("")

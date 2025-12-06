@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 
 const SideBar = () => {
 
-  const {getUsers, users, selectedUser, setselectedUser, unseenMessages} = useContext(ChatContext);
+  const {getUsers, users, selectedUser, setselectedUser, unseenMessages, setUnseenMessages } = useContext(ChatContext);
 
   const [input, setInput] = useState(false)
 
@@ -48,7 +48,7 @@ const SideBar = () => {
       </div>
       <div className='flex flex-col'>
         {filteredUsers.map((user, index)=>(
-            <div onClick={()=> {setselectedUser(user); setUnseenMessages(prev => ({...prev, [user._id]:0}))}} 
+            <div onClick={()=> {setselectedUser(user); setUnseenMessages(prev => ({...prev, [user._id]: 0 }))}} 
             key={index} className={`relative flex items-center gap-2 p-2 pl-4 
                 rounded cursor-pointer max-sm:text-sm ${selectedUser?._id === user._id && 'bg-[#282142]/50'}`}>
                 <img src={user?.profilePic || assets.avatar_icon} alt="" 
@@ -61,7 +61,7 @@ const SideBar = () => {
                         : <span className='text-neutral-400 text-xs'>Offline</span>
                     }
                 </div>
-                {unseenMessages[user._id] > 0 && <p className='absolute top-4 right-4 text-xs h-5 w-5 
+                {unseenMessages?.[user._id] > 0 && <p className='absolute top-4 right-4 text-xs h-5 w-5 
                 flex justify-center item-center rounded-full bg-violet-500/50'>{unseenMessages[user._id]}</p>}
             </div>
      ))}

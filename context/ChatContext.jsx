@@ -14,7 +14,7 @@ export const ChatProvider = ({ children }) =>{
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUser, setselectedUser] = useState(null);
-    const [unSeenMessages, setUnseenMessages] = useState({});
+    const [unseenMessages, setUnseenMessages] = useState({});
 
     const {socket, axios} = useContext(AuthContext);
 
@@ -24,7 +24,7 @@ export const ChatProvider = ({ children }) =>{
             const{data} = await axios.get("/api/messages/users");
             if(data.success){
                 setUsers(data.users)
-                setUnseenMessages(data.unSeenMessages)
+                setUnseenMessages(data.unseenMessages)
             }
         } catch (error) {
             toast.error(error.message)
@@ -90,7 +90,7 @@ export const ChatProvider = ({ children }) =>{
     }, [socket, selectedUser])
 
     const value = {
-        messages, users, selectedUser, getUsers, getMessages, sendMessage, setselectedUser, unSeenMessages, setUnseenMessages
+        messages, users, selectedUser, getUsers, getMessages, sendMessage, setselectedUser, unseenMessages, setUnseenMessages
     }
 
     return(
