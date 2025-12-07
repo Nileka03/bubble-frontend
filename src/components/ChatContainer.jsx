@@ -1,28 +1,78 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState, useContext } from 'react'
 import assets from '../assets/assets'
 import { formatMessageTime } from '../lib/utils';
-import { useContext } from 'react';
 import { ChatContext } from '../../context/ChatContext';
 import { AuthContext } from '../../context/AuthContext';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
+import axios from 'axios'; // Ensure axios is installed: npm install axios
 
 const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
     const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } = useContext(ChatContext)
-
     const { authUser, onlineUsers } = useContext(AuthContext)
+
+    // --- AI STATE ---
+    const [suggestions, setSuggestions] = useState([]);
+    const [loadingAI, setLoadingAI] = useState(false);
+    // ----------------
 
     const scrollEnd = useRef()
     const [input, setInput] = useState('');
 
+    // --- AI LOGIC: Trigger Fetch ---
+    useEffect(() => {
+        const fetchSmartReplies = async () => {
+            if (!messages || messages.length === 0) return;
 
-    //handle sending a message
+            // Sort messages to ensure we check the absolute latest one
+            const sortedMessages = [...messages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            const lastMsg = sortedMessages[sortedMessages.length - 1];
+
+            // Only fetch if the last message is from the PARTNER
+            if (lastMsg.senderId === selectedUser._id) {
+                setLoadingAI(true);
+                try {
+                    // Update this URL if your backend port is different
+                    // withCredentials: true is vital for cookies!
+                    const res = await axios.post(
+                        `http://localhost:5000/api/ai/smart-replies/${selectedUser._id}`, 
+                        {}, 
+                        { withCredentials: true }
+                    );
+                    
+                    if (res.data.suggestions && res.data.suggestions.length > 0) {
+                        setSuggestions(res.data.suggestions);
+                    }
+                } catch (err) {
+                    // Fail silently so user experience isn't broken
+                    console.log("AI fetch skipped:", err.message);
+                } finally {
+                    setLoadingAI(false);
+                }
+            } else {
+                // If I sent the last message, clear suggestions
+                setSuggestions([]);
+            }
+        };
+
+        fetchSmartReplies();
+    }, [messages, selectedUser, authUser._id]);
+
+    const handleSuggestionClick = (text) => {
+        setInput(text);
+        setSuggestions([]); // Clear chips immediately
+        // Optional: Auto-send? Usually better to let user review first.
+    };
+    // -------------------------------
+
+
+    // handle sending a message
     const handleSendMessage = async (e) => {
         e.preventDefault();
         if (input.trim() === "") return null;
         await sendMessage({ text: input.trim() });
-        setInput("")
+        setInput("");
+        setSuggestions([]); // Clear any lingering suggestions
     }
 
     // handle sending an image
@@ -45,7 +95,8 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
     useEffect(() => {
         if (selectedUser) {
-            getMessages(selectedUser._id)
+            getMessages(selectedUser._id);
+            setSuggestions([]); // Reset when switching chats
         }
     }, [selectedUser])
 
@@ -83,11 +134,11 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
 
             <div className='flex-1 overflow-y-auto p-4 pb-6 custom-scrollbar'>
-                {messages.map((msg, index) => (
+                {[...messages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map((msg, index) => (
                     <div key={index} className={`flex items-end gap-2 mb-4 justify-end ${msg.senderId !== authUser._id &&
                         'flex-row-reverse'}`}>
 
-                        {/* message content */}
+                        {/* Message Content */}
                         <div className={`flex flex-col ${msg.senderId === authUser._id ? 'items-end' : 'items-start'} max-w-[70%]`}>
                             {msg.image ? (
                                 <img onClick={() => window.open(msg.image)} src={msg.image} alt=""
@@ -105,7 +156,7 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                             </p>
                         </div>
 
-                        {/* avatar */}
+                        {/* Avatar */}
                         <img src={msg.senderId === authUser._id ? authUser?.profilePic || assets.avatar_icon
                             : selectedUser?.profilePic || assets.avatar_icon} alt=""
                             className='w-8 h-8 object-cover rounded-full border border-white/10 mb-1' />
@@ -117,16 +168,40 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
 
 
-            {/*--------------bottom area--------------*/}
-            <div className='p-4 bg-transparent'>
+            {/*--------------bottom area (INPUT)--------------*/}
+            <div className='p-4 bg-transparent relative'>
+
+                {/* ✨ AI SUGGESTIONS UI ✨ */}
+                {suggestions.length > 0 && (
+                     <div className="absolute -top-10 left-4 right-4 flex gap-2 overflow-x-auto no-scrollbar pb-2 z-10">
+                        {suggestions.map((reply, idx) => (
+                            <button 
+                                key={idx}
+                                onClick={() => handleSuggestionClick(reply)}
+                                className="whitespace-nowrap bg-black/40 backdrop-blur-md border border-white/10 
+                                           text-gray-200 text-sm px-4 py-2 rounded-full hover:bg-orange-500/20 
+                                           hover:border-orange-500/50 hover:text-white transition-all duration-200 animate-in fade-in slide-in-from-bottom-2"
+                            >
+                                {reply} ✨
+                            </button>
+                        ))}
+                     </div>
+                )}
+
                 <div className='flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full focus-within:border-orange-500/50 focus-within:bg-white/10 transition-all duration-300'>
                     <input onChange={handleSendImage} type="file" id='image' accept='image/png, image/jpeg' hidden />
                     <label htmlFor='image'>
                         <img src={assets.gallery_icon} alt="" className='w-6 cursor-pointer opacity-50 hover:opacity-100 hover:scale-110 transition-all' />
                     </label>
 
-                    <input onChange={(e) => setInput(e.target.value)} value={input} onKeyDown={(e) => e.key === "Enter" ? handleSendMessage(e) : null} type="text" placeholder='Type a message...'
-                        className='flex-1 text-sm bg-transparent border-none outline-none text-white placeholder-gray-500' />
+                    <input 
+                        onChange={(e) => setInput(e.target.value)} 
+                        value={input} 
+                        onKeyDown={(e) => e.key === "Enter" ? handleSendMessage(e) : null} 
+                        type="text" 
+                        placeholder={loadingAI ? "AI is thinking..." : "Type a message..."}
+                        className='flex-1 text-sm bg-transparent border-none outline-none text-white placeholder-gray-500' 
+                    />
 
                     <button onClick={handleSendMessage} disabled={!input.trim()}
                         className={`p-2 rounded-full transition-all ${input.trim() ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-transparent text-gray-600'}`}>
