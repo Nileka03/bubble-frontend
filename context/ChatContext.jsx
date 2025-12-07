@@ -9,20 +9,20 @@ import { useEffect } from "react";
 
 export const ChatContext = createContext();
 
-export const ChatProvider = ({ children }) =>{
+export const ChatProvider = ({ children }) => {
 
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
     const [selectedUser, setselectedUser] = useState(null);
     const [unseenMessages, setUnseenMessages] = useState({});
 
-    const {socket, axios} = useContext(AuthContext);
+    const { socket, axios } = useContext(AuthContext);
 
     //function to get all users to sidebar
     const getUsers = async () => {
         try {
-            const{data} = await axios.get("/api/messages/users");
-            if(data.success){
+            const { data } = await axios.get("/api/messages/users");
+            if (data.success) {
                 setUsers(data.users)
                 setUnseenMessages(data.unseenMessages)
             }
@@ -33,10 +33,10 @@ export const ChatProvider = ({ children }) =>{
 
     // function to get messages for selected user
 
-    const getMessages = async (userId) =>{
+    const getMessages = async (userId) => {
         try {
-            const {data} = await axios.get(`/api/messages/${userId}`);
-            if(data.success){
+            const { data } = await axios.get(`/api/messages/${userId}`);
+            if (data.success) {
                 setMessages(data.messages)
             }
         } catch (error) {
@@ -49,10 +49,19 @@ export const ChatProvider = ({ children }) =>{
 
     const sendMessage = async (messageData) => {
         try {
-            const {data} = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
-            if(data.success){
-                setMessages((prevMessages)=>[...prevMessages, data.newMessage])
-            }else {
+            const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
+            if (data.success) {
+                setMessages((prevMessages) => [...prevMessages, data.newMessage])
+                setUsers(prevUsers => {
+                    const updatedUsers = prevUsers.map(user => {
+                        if (user._id === selectedUser._id) {
+                            return { ...user, lastMessage: data.newMessage.text || "Photo", lastMessageTime: data.newMessage.createdAt };
+                        }
+                        return user;
+                    });
+                    return updatedUsers;
+                });
+            } else {
                 toast.error(data.message);
             }
         } catch (error) {
@@ -61,41 +70,50 @@ export const ChatProvider = ({ children }) =>{
     }
 
     //function to subscribe to messages for selected user
-    const subscribeToMessages = async () =>{
-        if(!socket) return;
+    const subscribeToMessages = async () => {
+        if (!socket) return;
 
-        socket.on("newMessage", (newMessage)=>{
-            if(selectedUser && newMessage.senderId === selectedUser._id){
+        socket.on("newMessage", (newMessage) => {
+            if (selectedUser && newMessage.senderId === selectedUser._id) {
                 newMessage.seen = true;
-                setMessages((prevMessages)=> [...prevMessages, newMessage]);
+                setMessages((prevMessages) => [...prevMessages, newMessage]);
                 axios.put(`/api/messages/mark/${newMessage._id}`);
-            }else{
-                setUnseenMessages((prevUnseenMessages)=>({
-                    ...prevUnseenMessages, [newMessage.senderId] :
-                    prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages
-                    [newMessage.senderId] + 1 : 1
+            } else {
+                setUnseenMessages((prevUnseenMessages) => ({
+                    ...prevUnseenMessages, [newMessage.senderId]:
+                        prevUnseenMessages[newMessage.senderId] ? prevUnseenMessages
+                        [newMessage.senderId] + 1 : 1
                 }))
             }
+            setUsers(prevUsers => {
+                const updatedUsers = prevUsers.map(user => {
+                    if (user._id === newMessage.senderId) {
+                        return { ...user, lastMessage: newMessage.text || "Photo", lastMessageTime: newMessage.createdAt };
+                    }
+                    return user;
+                });
+                return updatedUsers;
+            });
         })
     }
 
 
     //function to unsubscribe from messages
-    const unsubscribeFromMessages = ()=>{
-        if(socket) socket.off("newMessage");
+    const unsubscribeFromMessages = () => {
+        if (socket) socket.off("newMessage");
     }
-    useEffect(()=>{
+    useEffect(() => {
         subscribeToMessages();
-        return ()=> unsubscribeFromMessages();
+        return () => unsubscribeFromMessages();
     }, [socket, selectedUser])
 
     const value = {
         messages, users, selectedUser, getUsers, getMessages, sendMessage, setselectedUser, unseenMessages, setUnseenMessages
     }
 
-    return(
+    return (
         <ChatContext.Provider value={value}>
-            { children }  
+            {children}
         </ChatContext.Provider>
     )
 }

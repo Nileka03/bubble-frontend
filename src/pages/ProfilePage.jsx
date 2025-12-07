@@ -43,8 +43,9 @@ const ProfilePage = () => {
           <label htmlFor="avatar" className='flex items-center gap-3 cursor-pointer'>
             <input onChange={(e)=> setSelectedImg(e.target.files[0])}
             type="file" id='avatar' accept='.png, .jpg, .jpeg' hidden/>
+            
             <img src={selectedImg ? URL.createObjectURL(selectedImg) : assets.avatar_icon}
-            alt="" className={`w-12 h-12 ${selectedImg && 'rounded-full'}`}/> Upload Profile image
+            alt="" className='w-12 h-12 object-cover rounded-full'/> Upload Profile image
           </label>
 
           <input onChange={(e)=> setName(e.target.value)} value={name} 
@@ -59,7 +60,8 @@ const ProfilePage = () => {
         to-violet-600 text-white p-2 rounded-full text-lg cursor-pointer'>Save</button>
 
         </form>
-        <img className={`max-w-35 aspect-square rounded-cover mx-10 max-sm:mt-10 ${selectedImg && 'rounded-full'}`}
+        
+        <img className='w-36 h-36 object-cover rounded-full mx-10 max-sm:mt-10'
         src={authUser?.profilePic || assets.logo_icon} alt="" />
       </div>
     </div>
