@@ -1,5 +1,5 @@
 import avatar_icon from './avatar_icon.png'
-import gallery_icon from './gallery_icon.svg'
+import gallery_icon from './gallery_icon.png'
 import help_icon from './help_icon.png'
 import logo_icon from './chat.png'
 import logo_big from './logo_big.svg'
