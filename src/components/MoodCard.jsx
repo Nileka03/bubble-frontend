@@ -9,47 +9,45 @@ const MoodCard = ({
   motionEnabled, 
   className 
 }) => {
-  // 1. Determine Theme
+  
   const moodKey = currentMood?.emotion || "neutral";
-  // Fallback to neutral if the AI invents a mood we don't have
+  // Fallback to neutral if the ai invents a mood we don't have
   const theme = moodThemes[moodKey] || moodThemes.neutral;
   
-  // 2. Accessibility Checks
+  //check if the user have the toggle enabled
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = motionEnabled && !prefersReducedMotion;
 
   return (
     <div className="relative w-full h-full group">
       
-      {/* --- GLOW LAYER (The Soft Light) --- */}
+      
       <motion.div
         className="absolute -inset-1 rounded-3xl blur-2xl opacity-40"
         animate={{
-          backgroundColor: theme.colors[0], // Animate the base color
-          boxShadow: `0 0 60px ${theme.glow}` // Animate the glow size/color
+          backgroundColor: theme.colors[0], 
+          boxShadow: `0 0 60px ${theme.glow}` 
         }}
         transition={{
-          duration: 3.0, // <--- SLOW LIQUID TRANSITION (3 seconds)
+          duration: 3.0, 
           ease: "easeInOut"
         }}
       />
 
-      {/* --- BORDER LAYER (The Moving Gradient) --- */}
+      
       <motion.div
         className="absolute -inset-[2px] rounded-2xl opacity-80"
         style={{
-          backgroundSize: "200% 200%", // Needed for movement
+          backgroundSize: "200% 200%", 
         }}
-        // We put the gradient in 'animate' so Framer Motion interpolates it
+        
         animate={{
           backgroundImage: `linear-gradient(45deg, ${theme.colors.join(", ")})`,
           backgroundPosition: shouldAnimate ? ["0% 50%", "100% 50%", "0% 50%"] : "0% 50%"
         }}
-        // We use TWO transitions:
-        // 1. One for the 'backgroundImage' (Color change) -> Slow & Smooth
-        // 2. One for the 'backgroundPosition' (Movement) -> Constant loop
+        
         transition={{
-          backgroundImage: { duration: 2.5, ease: "linear" }, // Takes 2.5s to morph colors
+          backgroundImage: { duration: 2.5, ease: "linear" }, 
           backgroundPosition: {
              duration: theme.speed,
              repeat: Infinity,
@@ -58,8 +56,7 @@ const MoodCard = ({
         }}
       />
 
-      {/* --- CONTENT LAYER (The Glass Card) --- */}
-      {/* We apply the background logic here to hide the center of the gradient div above */}
+      
       <div className={cn("relative h-full w-full bg-black/40 backdrop-blur-xl rounded-2xl overflow-hidden", className)}>
         {children}
       </div>

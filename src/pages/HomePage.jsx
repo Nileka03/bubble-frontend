@@ -15,9 +15,7 @@ const HomePage = () => {
       <MoodCard
         currentMood={currentMood}
         motionEnabled={isMotionEnabled}
-        // We pass the grid and layout classes here. 
-        // Note: 'h-full', 'rounded-2xl', 'overflow-hidden' are already inside MoodCard, 
-        // but adding the specific grid logic here ensures your layout breaks correctly.
+        
         className={`
           grid grid-cols-1 border border-white/20 relative
           ${selectedUser 
