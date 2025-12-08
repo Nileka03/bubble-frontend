@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     //check if the user is authenticated and if so, set the user data and connect to socket
     const checkAuth = async () => {
         try {
-            const { data } = await axiosInstance.get('/api/auth/check');
+            const { data } = await axiosInstance.get('/auth/check');
             if (data.success) {
                 setAuthUser(data.user)
                 connectSocket(data.user)
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     // login function to handle user authetication and socket connection
     const login = async (state, credentials) => {
         try {
-            const { data } = await axios.post(`/api/auth/${state}`, credentials);
+            const { data } = await axiosInstance.post(`/auth/${state}`, credentials);
             if (data.success) {
                 setAuthUser(data.userData);
                 connectSocket(data.userData);
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     // update profile function to handle user profile updates
     const updateProfile = async (body) => {
         try {
-            const { data } = await axiosInstance.put("/api/auth/update-profile", body);
+            const { data } = await axiosInstance.put("/auth/update-profile", body);
             if (data.success) {
                 setAuthUser(data.user);
                 toast.success("Profile updated successfully")
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
 
     const deleteAccount = async () => {
         try {
-            const { data } = await axiosInstance.delete("/api/auth/delete");
+            const { data } = await axiosInstance.delete("/auth/delete");
             if (data.success) {
                 logout();
                 toast.success("Account deleted successfully");
