@@ -39,7 +39,7 @@ const LoginPage = () => {
           
         </h2>
 
-        {/*only show the full name is the user is signing up not when login */}
+        {/*only show the full name if the user is signing up not when login */}
         {currState === "Sign up" && !isDataSubmitted &&(
           <input onChange={(e)=>setFullName(e.target.value)} value={fullName}
           type="text" className='p-2 border border-gray-500 rounded-md
