@@ -215,7 +215,7 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                 <img src={assets.logo_icon} alt="" className='w-12 opacity-30' />
             </div>
             <div className="text-center">
-                <h2 className='text-2xl font-bold text-white/80 mb-1'>Welcome to ChatApp</h2>
+                <h2 className='text-2xl font-bold text-white/80 mb-1'>Welcome to BubbleChat</h2>
                 <p className='text-sm text-black'>Select a chat to start messaging</p>
             </div>
         </div>
