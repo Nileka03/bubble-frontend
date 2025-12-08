@@ -16,6 +16,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug - List Files
+        run: |
+          echo "Listing root files:"
+          ls -la
+          echo "Listing client folder (if exists):"
+          ls -la client || echo "Client folder not found"
       
       - name: Use Node.js
         uses: actions/setup-node@v4
