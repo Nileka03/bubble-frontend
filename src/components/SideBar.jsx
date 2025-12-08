@@ -173,9 +173,9 @@ const SideBar = () => {
               <div className="relative">
                 <img src={user?.profilePic || assets.avatar_icon} alt=""
                   className='w-12 h-12 object-cover rounded-full' />
-                {onlineUsers.includes(user._id) &&
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></span>
-                }
+                {Array.isArray(onlineUsers) && onlineUsers.includes(user._id) &&
+        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></span>
+    }
               </div>
 
               <div className='flex flex-col flex-1 min-w-0'>
