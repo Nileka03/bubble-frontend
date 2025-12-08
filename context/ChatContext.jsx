@@ -5,8 +5,6 @@ import { AuthContext } from "./AuthContext";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
 
-
-
 export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
@@ -16,7 +14,27 @@ export const ChatProvider = ({ children }) => {
     const [selectedUser, setselectedUser] = useState(null);
     const [unseenMessages, setUnseenMessages] = useState({});
 
+    // --- NEW: Motion & Mood State ---
+    // 1. Initialize Motion State from LocalStorage (persists across refreshes)
+    const [isMotionEnabled, setIsMotionEnabled] = useState(() => {
+        const saved = localStorage.getItem("isMotionEnabled");
+        // Default to true if not found
+        return saved !== null ? JSON.parse(saved) : true;
+    });
+
+    // 2. Current Mood State (Defaults to neutral)
+    const [currentMood, setCurrentMood] = useState({ emotion: "neutral", intensity: 1 });
+
     const { socket, axios } = useContext(AuthContext);
+
+    // --- NEW: Motion Toggle Function ---
+    const toggleMotion = () => {
+        setIsMotionEnabled((prev) => {
+            const newValue = !prev;
+            localStorage.setItem("isMotionEnabled", JSON.stringify(newValue));
+            return newValue;
+        });
+    };
 
     //function to get all users to sidebar
     const getUsers = async () => {
@@ -32,7 +50,6 @@ export const ChatProvider = ({ children }) => {
     }
 
     // function to get messages for selected user
-
     const getMessages = async (userId) => {
         try {
             const { data } = await axios.get(`/api/messages/${userId}`);
@@ -46,7 +63,6 @@ export const ChatProvider = ({ children }) => {
 
 
     //function to send messages for the selected user
-
     const sendMessage = async (messageData) => {
         try {
             const { data } = await axios.post(`/api/messages/send/${selectedUser._id}`, messageData);
@@ -95,20 +111,54 @@ export const ChatProvider = ({ children }) => {
                 return updatedUsers;
             });
         })
+
+        // --- NEW: Listen for AI Mood Updates ---
+        socket.on("moodUpdate", (newMood) => {
+            // Only update if we are chatting with the person involved in the update
+            // (The backend sends this event to specific socket IDs, so we can trust it matches the conversation context)
+            setCurrentMood(newMood);
+        });
     }
 
 
     //function to unsubscribe from messages
     const unsubscribeFromMessages = () => {
-        if (socket) socket.off("newMessage");
+        if (socket) {
+            socket.off("newMessage");
+            socket.off("moodUpdate"); // --- NEW: Cleanup mood listener
+        }
     }
+    
     useEffect(() => {
         subscribeToMessages();
         return () => unsubscribeFromMessages();
     }, [socket, selectedUser])
 
+    // --- NEW: Reset mood when switching users ---
+    useEffect(() => {
+        if (selectedUser) {
+            // Reset to neutral immediately when you click a new person
+            // This prevents "carrying over" the anger/joy from the previous chat
+            setCurrentMood({ emotion: "neutral", intensity: 1 });
+        }
+    }, [selectedUser]);
+
+
     const value = {
-        messages, users, selectedUser, getUsers, getMessages, sendMessage, setselectedUser, unseenMessages, setUnseenMessages
+        messages, 
+        users, 
+        selectedUser, 
+        getUsers, 
+        getMessages, 
+        sendMessage, 
+        setselectedUser, 
+        unseenMessages, 
+        setUnseenMessages,
+        // --- NEW: Exported Values ---
+        isMotionEnabled,
+        toggleMotion,
+        currentMood,
+        setCurrentMood 
     }
 
     return (
