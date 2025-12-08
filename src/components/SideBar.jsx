@@ -27,7 +27,9 @@ const SideBar = () => {
   const filteredUsers = input
     ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase()))
     : [...users].sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
-  const activeUsers = users.filter(user => onlineUsers.includes(user._id));
+  const activeUsers = users.filter(user => 
+  Array.isArray(onlineUsers) && onlineUsers.includes(user._id)
+);
 
   useEffect(() => {
     getUsers();
