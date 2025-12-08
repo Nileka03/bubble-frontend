@@ -4,7 +4,7 @@ import { formatMessageTime } from '../lib/utils';
 import { ChatContext } from '../../context/ChatContext';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import axios from 'axios'; 
+import { axiosInstance } from '../lib/axios'; 
 
 const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
@@ -32,10 +32,9 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                 setLoadingAI(true);
                 try {
                     
-                    const res = await axios.post(
-                        `http://localhost:5000/api/ai/smart-replies/${selectedUser._id}`,
-                        {},
-                        { withCredentials: true }
+                    const res = await axiosInstance.post(
+                        `/ai/smart-replies/${selectedUser._id}`,
+                        {} 
                     );
 
                     if (res.data.suggestions && res.data.suggestions.length > 0) {
