@@ -18,8 +18,8 @@ const SideBar = () => {
   } = useContext(ChatContext);
 
   const [input, setInput] = useState("");
-  const [showMenu, setShowMenu] = useState(false); // 1. State for menu visibility
-  const menuRef = useRef(null); // 2. Ref to detect clicks outside
+  const [showMenu, setShowMenu] = useState(false); 
+  const menuRef = useRef(null); 
 
   const { logout, onlineUsers } = useContext(AuthContext)
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const SideBar = () => {
     getUsers();
   }, [onlineUsers])
 
-  // 3. Close menu when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -55,16 +55,16 @@ const SideBar = () => {
         <div className='flex justify-between items-center'>
           <div className='flex items-center gap-2'>
             <img src={assets.logo} alt='logo' className='w-8 h-8 object-contain' />
-            <span className="font-bold text-xl tracking-wide">Chat<span className="text-orange-500">App</span></span>
+            <span className="font-bold text-xl tracking-wide">Bubble<span className="text-orange-500">Chat</span></span>
           </div>
 
           <div className="flex items-center gap-2">
             
-            {/* --- 1. MOTION TOGGLE BUTTON --- */}
+            
             <div className="relative group/tooltip">
                 <button 
                     onClick={toggleMotion}
-                    className={`p-2 rounded-full transition-all duration-300 border border-transparent
+                    className={`p-2  rounded-full transition-all duration-300 border border-transparent
                         ${isMotionEnabled 
                             ? "bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20" 
                             : "bg-transparent text-gray-400 hover:bg-white/10 hover:text-white"
@@ -91,19 +91,18 @@ const SideBar = () => {
                 </div>
             </div>
 
-            {/* --- 2. MENU BUTTON (Three Dots) --- */}
-            {/* Added ref={menuRef} here to detect clicks inside/outside */}
+            
             <div className='relative' ref={menuRef}>
               
               <div 
                 onClick={() => setShowMenu(!showMenu)} 
-                className={`p-2 rounded-full cursor-pointer transition-colors duration-200
+                className={`p-1 rounded-full cursor-pointer transition-colors duration-200
                   ${showMenu ? "bg-white/10" : "hover:bg-white/10"}`}
               >
                 <img src={assets.menu_icon} alt='menu' className='w-5 h-5 opacity-80' />
               </div>
               
-              {/* Dropdown Menu (Controlled by JS state showMenu, not CSS hover) */}
+              
               {showMenu && (
                 <div className='absolute top-full right-0 z-20 w-40 p-3 rounded-xl mt-2
                     bg-[#1a1a1a] border border-white/10 text-gray-300 shadow-2xl backdrop-blur-md

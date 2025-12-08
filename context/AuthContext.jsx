@@ -92,6 +92,19 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const deleteAccount = async () => {
+        try {
+            const { data } = await axios.delete("/api/auth/delete");
+            if (data.success) {
+                logout();
+                toast.success("Account deleted successfully");
+            }
+        } catch (error) {
+            toast.error("Failed to delete account");
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         if (token) {
             axios.defaults.headers.common["token"] = token;
@@ -106,7 +119,8 @@ export const AuthProvider = ({ children }) => {
         socket,
         login,
         logout,
-        updateProfile
+        updateProfile,
+        deleteAccount
     }
 
     return (
