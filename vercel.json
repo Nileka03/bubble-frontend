@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://bubble-chat-backend-s8ff.onrender.com"
+            "destination": "https://bubble-chat-backend-s8ff.onrender.com/api/$1"
         },
         {
             "source": "/(.*)",
