@@ -14,20 +14,19 @@ export const ChatProvider = ({ children }) => {
     const [selectedUser, setselectedUser] = useState(null);
     const [unseenMessages, setUnseenMessages] = useState({});
 
-    // --- NEW: Motion & Mood State ---
-    // 1. Initialize Motion State from LocalStorage (persists across refreshes)
+    
     const [isMotionEnabled, setIsMotionEnabled] = useState(() => {
         const saved = localStorage.getItem("isMotionEnabled");
-        // Default to true if not found
+        
         return saved !== null ? JSON.parse(saved) : true;
     });
 
-    // 2. Current Mood State (Defaults to neutral)
+    // current mood defaults to neutral
     const [currentMood, setCurrentMood] = useState({ emotion: "neutral", intensity: 1 });
 
     const { socket, axios } = useContext(AuthContext);
 
-    // --- NEW: Motion Toggle Function ---
+    // toggle function
     const toggleMotion = () => {
         setIsMotionEnabled((prev) => {
             const newValue = !prev;
@@ -112,10 +111,9 @@ export const ChatProvider = ({ children }) => {
             });
         })
 
-        // --- NEW: Listen for AI Mood Updates ---
+        
         socket.on("moodUpdate", (newMood) => {
-            // Only update if we are chatting with the person involved in the update
-            // (The backend sends this event to specific socket IDs, so we can trust it matches the conversation context)
+            
             setCurrentMood(newMood);
         });
     }
@@ -125,7 +123,7 @@ export const ChatProvider = ({ children }) => {
     const unsubscribeFromMessages = () => {
         if (socket) {
             socket.off("newMessage");
-            socket.off("moodUpdate"); // --- NEW: Cleanup mood listener
+            socket.off("moodUpdate"); 
         }
     }
     
@@ -134,11 +132,10 @@ export const ChatProvider = ({ children }) => {
         return () => unsubscribeFromMessages();
     }, [socket, selectedUser])
 
-    // --- NEW: Reset mood when switching users ---
+    // reset mood when switching users
     useEffect(() => {
         if (selectedUser) {
-            // Reset to neutral immediately when you click a new person
-            // This prevents "carrying over" the anger/joy from the previous chat
+            
             setCurrentMood({ emotion: "neutral", intensity: 1 });
         }
     }, [selectedUser]);
@@ -154,7 +151,7 @@ export const ChatProvider = ({ children }) => {
         setselectedUser, 
         unseenMessages, 
         setUnseenMessages,
-        // --- NEW: Exported Values ---
+        
         isMotionEnabled,
         toggleMotion,
         currentMood,
