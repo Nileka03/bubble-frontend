@@ -27,9 +27,7 @@ const SideBar = () => {
   const filteredUsers = input
     ? users.filter((user) => user.fullName.toLowerCase().includes(input.toLowerCase()))
     : [...users].sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime));
-  const activeUsers = users.filter(user => 
-  Array.isArray(onlineUsers) && onlineUsers.includes(user._id)
-);
+  const activeUsers = users.filter(user => onlineUsers.includes(user._id));
 
   useEffect(() => {
     getUsers();
@@ -173,9 +171,9 @@ const SideBar = () => {
               <div className="relative">
                 <img src={user?.profilePic || assets.avatar_icon} alt=""
                   className='w-12 h-12 object-cover rounded-full' />
-                {Array.isArray(onlineUsers) && onlineUsers.includes(user._id) &&
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></span>
-    }
+                {onlineUsers.includes(user._id) &&
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></span>
+                }
               </div>
 
               <div className='flex flex-col flex-1 min-w-0'>

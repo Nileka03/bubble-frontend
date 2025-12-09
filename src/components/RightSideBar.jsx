@@ -16,7 +16,7 @@ const RightSideBar = () => {
     )
   }, [messages])
 
-  const isOnline = Array.isArray(onlineUsers) && onlineUsers.includes(selectedUser?._id);
+  const isOnline = onlineUsers.includes(selectedUser?._id);
 
   return selectedUser ? (
     <div className={`w-full h-full border-l border-white/10 relative flex flex-col bg-black/40 backdrop-blur-lg text-white overflow-hidden

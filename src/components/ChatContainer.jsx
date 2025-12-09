@@ -4,7 +4,7 @@ import { formatMessageTime } from '../lib/utils';
 import { ChatContext } from '../../context/ChatContext';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import { axiosInstance } from '../lib/axios'; 
+import axios from 'axios'; 
 
 const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
@@ -32,9 +32,10 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                 setLoadingAI(true);
                 try {
                     
-                    const res = await axiosInstance.post(
-                        `/ai/smart-replies/${selectedUser._id}`,
-                        {} 
+                    const res = await axios.post(
+                        `http://localhost:5000/api/ai/smart-replies/${selectedUser._id}`,
+                        {},
+                        { withCredentials: true }
                     );
 
                     if (res.data.suggestions && res.data.suggestions.length > 0) {
@@ -110,16 +111,14 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
             <div className='flex items-center gap-3 py-3 mx-4 border-b border-white/10'>
                 <div className="relative">
                     <img src={selectedUser.profilePic || assets.avatar_icon} alt="" className='w-10 h-10 object-cover rounded-full border border-white/10' />
-                    {Array.isArray(onlineUsers) && onlineUsers.includes(selectedUser._id) && (
-            <span className='absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black'></span>
-        )}
+                    {onlineUsers.includes(selectedUser._id) && <span className='absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-black'></span>}
                 </div>
                 <div className='flex-1 flex flex-col'>
                     <p className='text-lg font-medium text-white leading-tight'>
                         {selectedUser.fullName}
                     </p>
                     <p className='text-xs text-gray-400'>
-                        {Array.isArray(onlineUsers) && onlineUsers.includes(selectedUser._id) ? 'Online' : 'Offline'}
+                        {onlineUsers.includes(selectedUser._id) ? 'Online' : 'Offline'}
                     </p>
                 </div>
                 <img onClick={() => setSelectedUser(null)} src={assets.arrow_icon} alt="" className='md:hidden max-w-7 cursor-pointer hover:opacity-80' />
