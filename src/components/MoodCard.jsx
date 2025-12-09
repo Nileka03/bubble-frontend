@@ -10,7 +10,10 @@ const MoodCard = ({
   className
 }) => {
 
-  const moodKey = currentMood?.emotion || "neutral";
+  // Use the mood only if mood effect (motionEnabled) is on.
+  // Otherwise, fallback to neutral for a static view.
+  const moodKey = motionEnabled ? (currentMood?.emotion || "neutral") : "neutral";
+
   // Fallback to neutral if the ai invents a mood we don't have
   const theme = moodThemes[moodKey] || moodThemes.neutral;
 
