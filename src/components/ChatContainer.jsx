@@ -4,21 +4,21 @@ import { formatMessageTime } from '../lib/utils';
 import { ChatContext } from '../../context/ChatContext';
 import { AuthContext } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import axios from 'axios'; 
+import axios from 'axios';
 
 const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
     const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } = useContext(ChatContext)
     const { authUser, onlineUsers } = useContext(AuthContext)
 
-    
+
     const [suggestions, setSuggestions] = useState([]);
     const [loadingAI, setLoadingAI] = useState(false);
-    
+
     const scrollEnd = useRef()
     const [input, setInput] = useState('');
 
-    
+
     useEffect(() => {
         const fetchSmartReplies = async () => {
             if (!messages || messages.length === 0) return;
@@ -27,13 +27,13 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
             const sortedMessages = [...messages].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
             const lastMsg = sortedMessages[sortedMessages.length - 1];
 
-            
+
             if (lastMsg.senderId === selectedUser._id) {
                 setLoadingAI(true);
                 try {
-                    
+
                     const res = await axios.post(
-                        `http://localhost:5000/api/ai/smart-replies/${selectedUser._id}`,
+                        `/api/ai/smart-replies/${selectedUser._id}`,
                         {},
                         { withCredentials: true }
                     );
@@ -42,13 +42,13 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                         setSuggestions(res.data.suggestions);
                     }
                 } catch (err) {
-                    
+
                     console.log("AI fetch skipped:", err.message);
                 } finally {
                     setLoadingAI(false);
                 }
             } else {
-                
+
                 setSuggestions([]);
             }
         };
@@ -58,9 +58,9 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
 
     const handleSuggestionClick = (text) => {
         setInput(text);
-        setSuggestions([]); 
+        setSuggestions([]);
     };
-    
+
 
 
     // handle sending a message
@@ -69,7 +69,7 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
         if (input.trim() === "") return null;
         await sendMessage({ text: input.trim() });
         setInput("");
-        setSuggestions([]); 
+        setSuggestions([]);
     }
 
     // handle sending an image
@@ -179,7 +179,7 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
                                            text-gray-200 text-sm px-4 py-2 rounded-full hover:bg-orange-500/20 
                                            hover:border-orange-500/50 hover:text-white transition-all duration-200 animate-in fade-in slide-in-from-bottom-2"
                             >
-                                {reply} 
+                                {reply}
                             </button>
                         ))}
                     </div>
