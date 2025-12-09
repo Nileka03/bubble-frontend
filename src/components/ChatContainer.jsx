@@ -94,6 +94,7 @@ const ChatContainer = ({ showRightSide, setShowRightSide }) => {
         if (selectedUser) {
             getMessages(selectedUser._id);
             setSuggestions([]);
+            setInput("");
         }
     }, [selectedUser])
 
