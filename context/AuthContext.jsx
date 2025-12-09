@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
 
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [authUser, setAuthUser] = useState(null);
-    const [onlineUsers, setOnlineUsers] = useState(null);
+    const [onlineUsers, setOnlineUsers] = useState([]);
     const [socket, setSocket] = useState(null);
 
     // connect socket function to handle socket conncetion and online users updates
