@@ -25,6 +25,7 @@ const MoodCard = ({
     <div className="relative w-full h-full group">
 
 
+
       <motion.div
         className="absolute -inset-1 rounded-3xl blur-2xl opacity-40"
         animate={{

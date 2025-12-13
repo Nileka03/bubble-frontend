@@ -30,6 +30,7 @@ const LoginPage = () => {
       <div className='absolute top-[-10%] left-[-10%] w-96 h-96 bg-orange-600/20 rounded-full blur-[100px] pointer-events-none'></div>
       <div className='absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-orange-800/20 rounded-full blur-[100px] pointer-events-none'></div>
 
+
       <div className='w-full max-w-5xl flex items-center justify-center gap-10 sm:gap-20 max-sm:flex-col relative z-10'>
         {/*------------left---------- */}
         <div className='flex flex-col items-center justify-center'>

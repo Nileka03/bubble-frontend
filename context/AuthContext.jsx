@@ -123,6 +123,7 @@ export const AuthProvider = ({ children }) => {
         deleteAccount
     }
 
+    
     return (
         <AuthContext.Provider value={value}>
             {children}
