@@ -14,10 +14,10 @@ export const ChatProvider = ({ children }) => {
     const [selectedUser, setselectedUser] = useState(null);
     const [unseenMessages, setUnseenMessages] = useState({});
 
-    
+
     const [isMotionEnabled, setIsMotionEnabled] = useState(() => {
         const saved = localStorage.getItem("isMotionEnabled");
-        
+
         return saved !== null ? JSON.parse(saved) : true;
     });
 
@@ -111,10 +111,11 @@ export const ChatProvider = ({ children }) => {
             });
         })
 
-        
-        socket.on("moodUpdate", (newMood) => {
-            
-            setCurrentMood(newMood);
+
+        socket.on("moodUpdate", ({ userId, ...newMood }) => {
+            if (selectedUser && userId === selectedUser._id) {
+                setCurrentMood(newMood);
+            }
         });
     }
 
@@ -123,10 +124,10 @@ export const ChatProvider = ({ children }) => {
     const unsubscribeFromMessages = () => {
         if (socket) {
             socket.off("newMessage");
-            socket.off("moodUpdate"); 
+            socket.off("moodUpdate");
         }
     }
-    
+
     useEffect(() => {
         subscribeToMessages();
         return () => unsubscribeFromMessages();
@@ -135,27 +136,27 @@ export const ChatProvider = ({ children }) => {
     // reset mood when switching users
     useEffect(() => {
         if (selectedUser) {
-            
+
             setCurrentMood({ emotion: "neutral", intensity: 1 });
         }
     }, [selectedUser]);
 
 
     const value = {
-        messages, 
-        users, 
-        selectedUser, 
-        getUsers, 
-        getMessages, 
-        sendMessage, 
-        setselectedUser, 
-        unseenMessages, 
+        messages,
+        users,
+        selectedUser,
+        getUsers,
+        getMessages,
+        sendMessage,
+        setselectedUser,
+        unseenMessages,
         setUnseenMessages,
-        
+
         isMotionEnabled,
         toggleMotion,
         currentMood,
-        setCurrentMood 
+        setCurrentMood
     }
 
     return (
